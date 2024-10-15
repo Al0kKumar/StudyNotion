@@ -33,7 +33,7 @@ const Signup = async (req,res) => {
 
     const hashedpassword = await bcrypt.hash(password,10);
 
-    const newuser = await User.create({username,email,password: hashedpassword});
+    const newuser = await User.create({firstname,lastname,email,password: hashedpassword});
 
     if(!newuser){
         return res.status(404).json({msg:"Error during user creation"})
