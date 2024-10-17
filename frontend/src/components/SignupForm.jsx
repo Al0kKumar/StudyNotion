@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {AiOutlineEyeInvisible,AiOutlineEye} from "react-icons/ai"
  import {toast} from "react-hot-toast"
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from  'axios'
+
 function SignupForm({setIsLoggedIn}) {
-const navigate=useNavigate()
+const navigate = useNavigate()
     const [formData,setFormData] =  useState({
           firstname:"",
           lastname:"",
@@ -15,7 +17,6 @@ const navigate=useNavigate()
 
     const [showPassword,setShowPassword] = useState(false)
     const [confirmshowPasswords,confirmsetShowPasswords] = useState(false)
-
     const [accountType,setAccountType]=useState("student")
 
 
@@ -29,32 +30,32 @@ const navigate=useNavigate()
         ))
     }
 
-    function submitHandler(event){
+   async  function submitHandler(event){
         event.preventDefault()
+        
        if(formData.password !== formData.confirmPassword){
         toast.error("Password doesn't match")
-    }
-    else{
-        setIsLoggedIn(true)
-        toast.success("Account created successfully")
-        const accountData={
+        return ;
+        }
+        const accountData = {
             ...formData
+        };
+     
+
+        const res = await axios.post('http://localhost:3000/api/v1/users/signup', accountData)
+        
+        if(res.status == 201 || res.status == 200){
+
+            setIsLoggedIn(true);
+            toast.success('Account created successfully')
+            navigate('/dashboard')
+        }
+        else{
+            console.error('Error during signup', error);
+            toast.error('Failed to create account .Please check the information and try again');
         }
 
-
-        
-    const finalData={
-        ...accountData,
-        accountType
     }
-    console.log("printing finalData")
-    console.log(finalData)
-    navigate("/dashboard")
-}
-
-
-    }
-   
 
 
   return (
@@ -163,8 +164,8 @@ const navigate=useNavigate()
     </form>
     
     </div>
-  )
-}
+  );
 
+}
 
 export default SignupForm

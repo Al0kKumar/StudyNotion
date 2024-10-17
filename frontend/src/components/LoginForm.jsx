@@ -4,6 +4,8 @@ import {useState} from "react"
 import {Link} from "react-router-dom"
 import {useNavigate} from "react-router-dom"
 import {toast} from "react-hot-toast"
+import axios from 'axios'
+
 function LoginForm({setIsLoggedIn}) {
 const navigate=useNavigate()
     const [formData,setFormData]=useState({
@@ -22,15 +24,31 @@ const navigate=useNavigate()
         ))
     }
 
-    function submitHandler(event){
-        event.preventDefault()
-        // signin hote h hum setIsLoggedIn ko true krke
-        setIsLoggedIn(true)
-        toast.success("Login Successful")
-        console.log("Printing the formData")
-        console.log(formData)
+  async function submitHandler(event){
+        
+       event.preventDefault();
 
-        navigate("/dashboard")
+        const logindata = {
+            ...formData
+        }
+
+        try {
+            const res = await axios.post('http://localhost:3000/api/v1/users/login', logindata);
+    
+            const token = res.data.token;
+            localStorage.setItem('token', token);
+    
+            if(res.status === 201 || res.status == 200){
+                setIsLoggedIn(true)
+                toast.success('Login successfull')
+                navigate("/dashboard")
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            toast.error('Login failed. Please check your credentials and try again.')
+            
+        }
+        
          
     }
   return (
@@ -75,7 +93,7 @@ const navigate=useNavigate()
 
 
   
-            <button className="bg-yellow-500 rounded-[8px] font-medium text-richblack-900 px-[12px] py-[8px] mt-6">Signup</button>
+            <button className="bg-yellow-500 rounded-[8px] font-medium text-richblack-900 px-[12px] py-[8px] mt-6">Login</button>
 
 
 
